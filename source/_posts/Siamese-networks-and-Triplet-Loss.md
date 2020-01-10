@@ -43,6 +43,26 @@ tags:
 1. 距离多近才能判断为属于同一个类别，还涉及到如何选择阈值；
 2. 不同类别的样本距离有多远，一般来说不同类之间越远越好。
 
+## 更换Omniglot数据集
+
+&emsp;&emsp;由于Omniglot数据量非常巨大且笔记本算力实在有限，我只选取了其中一种语言的24个不同类别，每个类别各有20个样本，并将每类20个样本按照3：1划分为训练集与验证集。只需要将源文件中的`buildDataSet()`函数进行重构，并按照标准输出即可更换数据集。
+
+Random Samples:
+
+{% asset_img random_sample1.png %}
+{% asset_img random_sample2.png %}
+
+Hard Samples:
+
+{% asset_img hard_sample1.png %}
+{% asset_img hard_sample2.png %}
+
+&emsp;&emsp;额外简化了`build_network()`返回模型中的一层`Dense`层后，共计训练10000次，耗时102.7mins。
+{% asset_img 训练时长.png %}
+
+&emsp;&emsp;经过10000次训练后，Loss值为0.147左右（还可以继续降低），使用验证集进行24分类的准确率为65%。
+
+
 ## 参考资料
 *文章：[One Shot learning, Siamese networks and Triplet Loss with Keras](https://medium.com/@crimy/one-shot-learning-siamese-networks-and-triplet-loss-with-keras-2885ed022352)*
 *代码：[CrimyTheBold/tripletloss](https://github.com/CrimyTheBold/tripletloss/blob/master/02%20-%20tripletloss%20MNIST.ipynb)*
