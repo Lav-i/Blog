@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/Blog/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/Blog/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/Blog/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/Blog/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/Blog/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/Blog/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/Blog/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="&amp;emsp;&amp;emsp;不知不觉已经第二年了，在过去的一年里我曾沉迷机器学习，沉迷集成学习，沉迷单细胞拷贝数变异检测。现在回想起来真的是苦不堪言，上手就给自己准备了个地狱难度开局，结果什么都没做出来。好在这学期一开学及时更换了方向，从DNA转去RNA，从机器学习变成深度学习，并且还有大佬指点，感觉一切都顺利多了。 CNN与GCN&amp;emsp;&amp;emsp;观察一个3x3大小的卷积核，当这个卷积核">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Graph Convolutional Networks">
+<meta property="og:url" content="https:&#x2F;&#x2F;lav-i.github.io&#x2F;Blog&#x2F;2020&#x2F;11&#x2F;16&#x2F;Graph-Convolutional-Networks&#x2F;index.html">
+<meta property="og:site_name" content="LLLLavi&#39;s Blog">
+<meta property="og:description" content="&amp;emsp;&amp;emsp;不知不觉已经第二年了，在过去的一年里我曾沉迷机器学习，沉迷集成学习，沉迷单细胞拷贝数变异检测。现在回想起来真的是苦不堪言，上手就给自己准备了个地狱难度开局，结果什么都没做出来。好在这学期一开学及时更换了方向，从DNA转去RNA，从机器学习变成深度学习，并且还有大佬指点，感觉一切都顺利多了。 CNN与GCN&amp;emsp;&amp;emsp;观察一个3x3大小的卷积核，当这个卷积核">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-11-17T14:34:39.447Z">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/Blog/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://lav-i.github.io/Blog/2020/11/16/Graph-Convolutional-Networks/"/>
+
+
+
+
+
+  <title>Graph Convolutional Networks | LLLLavi's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/Blog/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LLLLavi's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/Blog/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/Blog/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://lav-i.github.io/Blog/Blog/2020/11/16/Graph-Convolutional-Networks/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Lavi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/Blog/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LLLLavi's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Graph Convolutional Networks</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-11-16T23:06:05+08:00">
+                2020-11-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <script type="text/javascript"
+   src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<p>&emsp;&emsp;不知不觉已经第二年了，在过去的一年里我曾沉迷机器学习，沉迷集成学习，沉迷单细胞拷贝数变异检测。现在回想起来真的是苦不堪言，上手就给自己准备了个地狱难度开局，结果什么都没做出来。好在这学期一开学及时更换了方向，从DNA转去RNA，从机器学习变成深度学习，并且还有大佬指点，感觉一切都顺利多了。</p>
+<h2 id="CNN与GCN"><a href="#CNN与GCN" class="headerlink" title="CNN与GCN"></a>CNN与GCN</h2><p>&emsp;&emsp;观察一个3x3大小的卷积核，当这个卷积核在进行学习的时候，不仅能学习到目标像素点的信息，还包括了目标像素点周围的额外八个像素点。卷积核通过这紧挨着的9个像素点所存储的信息进行特征提取，学习到有用的信息。这在图（<em>Image</em>）上是可行的，因为相互临近的像素点确实是存储着相同或相似的信息。</p>
+<p>&emsp;&emsp;但是当使用的是非结构化数据比如图（<em>Graph</em>）时，普通的卷积核就不能工作了。在图卷积中，每个卷积核依然从周围的点中获取信息进行特征提取，但不同的是“周围的点”不再是目标点周围紧挨的点，而是在图结构中，由有向边或无向边连接的点。这种边在具体问题中通常代表了具体的含义，也可以附有不同的权重。</p>
+<h2 id="代码解读"><a href="#代码解读" class="headerlink" title="代码解读"></a>代码解读</h2><h3 id="图卷积层-layer"><a href="#图卷积层-layer" class="headerlink" title="图卷积层 layer"></a>图卷积层 layer</h3><p>&emsp;&emsp;图卷积中的层对应的是如下的公式：\(H^{(k+1)} = f(H^{(k)},A) = \sigma(AH^{(k)}W^{(k)})\)<br>其中\(\sigma(\cdot)\)是激活函数，\(W^{k}\)是可学习的权重，\(A\)是邻接矩阵，而\(H^{k}\)则是第k层节点的特征。</p>
+<p>&emsp;&emsp;一般来说在正式的模型训练中，也不会直接使用临界矩阵\(A\)，而是对\(A\)做一定的变换:\(\sigma(AH^{(k)}W^{(k)})=\sigma(\hat{D}^{-\frac{1}{2}}\hat{A}\hat{D}^{-\frac{1}{2}}H^{(k)}W^{(k)})\)<br>其中\(\hat{A}=A+I\)，\(\hat{D}\)是\(\hat{A}\)的度矩阵，而\(\hat{D}^{-\frac{1}{2}}\hat{A}\hat{D}^{-\frac{1}{2}}\)是对\(A\)做了一个对称的归一化。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GraphConvolution</span><span class="params">(Module)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, in_features, out_features, bias=True)</span>:</span></span><br><span class="line">        ......</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, input, adj)</span>:</span></span><br><span class="line">        support = torch.mm(input, self.weight)</span><br><span class="line">        output = torch.spmm(adj, support)</span><br><span class="line">        ......</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">normalize_adj</span><span class="params">(adj)</span>:</span></span><br><span class="line">    <span class="string">"""compute L=D^-0.5 * (A+I) * D^-0.5"""</span></span><br><span class="line">    adj += sp.eye(adj.shape[<span class="number">0</span>])</span><br><span class="line">    degree = np.array(adj.sum(<span class="number">1</span>))</span><br><span class="line">    d_hat = sp.diags(np.power(degree, <span class="number">-0.5</span>).flatten())</span><br><span class="line">    norm_adj = d_hat.dot(adj).dot(d_hat)</span><br><span class="line">    <span class="keyword">return</span> norm_adj</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="图卷积模型-model"><a href="#图卷积模型-model" class="headerlink" title="图卷积模型 model"></a>图卷积模型 model</h3><p>&emsp;&emsp;在图卷积的模型中，一般只使用两层图卷积，过多的添加层会引起过分的泛化进而降低模型的性能。同时，根据具体任务的不同，在图卷积层后可以添加需要的步骤，在节点分类任务中，只需要在最后一层添加<code>softmax()</code>激活函数即可。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GCN</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, nfeat, nhid, nclass, dropout)</span>:</span></span><br><span class="line">        super(GCN, self).__init__()</span><br><span class="line"></span><br><span class="line">        self.gc1 = GraphConvolution(nfeat, nhid)</span><br><span class="line">        self.gc2 = GraphConvolution(nhid, nclass)</span><br><span class="line">        self.dropout = dropout</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, x, adj)</span>:</span></span><br><span class="line">        x = F.relu(self.gc1(x, adj))</span><br><span class="line">        x = F.dropout(x, self.dropout, training=self.training)</span><br><span class="line">        x = self.gc2(x, adj)</span><br><span class="line">        <span class="keyword">return</span> F.log_softmax(x, dim=<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+
+<p>&emsp;&emsp;在链接预测任务中，要求模型在最后输出的是\(A\)，则需要在模型中再添加模型<code>InnerProductDecoder</code>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">InnerProductDecoder</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    <span class="string">"""Decoder for using inner product for prediction."""</span></span><br><span class="line"></span><br><span class="line">    ......</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, z)</span>:</span></span><br><span class="line">        z = F.dropout(z, self.dropout, training=self.training)</span><br><span class="line">        adj = self.act(torch.mm(z, z.t()))</span><br><span class="line">        <span class="keyword">return</span> adj</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><h3 id="基于注意力的图卷积模型"><a href="#基于注意力的图卷积模型" class="headerlink" title="基于注意力的图卷积模型"></a>基于注意力的图卷积模型</h3><p>&emsp;&emsp;注意力机制的核心就是关注目标点的所有邻接点，在这些邻接点中选择出对提取特征贡献值最大的部分邻接点，也就是对所有邻接节点使用<code>softmax</code>函数，将有限的 <strong>“注意力”</strong> （<em>也就是<code>softmax</code>中的最大值1</em>）分配给所有的邻接节点。<br>&emsp;&emsp;作为注意力机制的改进，可以引入 <strong>多头注意力</strong> （<em>multi head attention</em>）机制，也就是将多个带有<code>softmax</code>的注意力层并行，将得到的结果进行拼接。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><em><a href="https://github.com/tkipf/pygcn" target="_blank" rel="noopener">Graph Convolutional Networks in PyTorch</a></em><br><em><a href="https://github.com/Diego999/pyGAT" target="_blank" rel="noopener">Pytorch Graph Attention Network</a></em></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/Blog/2020/03/31/%E4%B8%80%E6%A0%B8%E6%9C%89%E9%9A%BE%EF%BC%8C%E5%85%AB%E6%A0%B8%E5%9B%B4%E8%A7%82/" rel="next" title="一核有难，八核围观">
+                <i class="fa fa-chevron-left"></i> 一核有难，八核围观
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/Blog/uploads/avatar.jpg"
+                alt="Lavi" />
+            
+              <p class="site-author-name" itemprop="name">Lavi</p>
+              <p class="site-description motion-element" itemprop="description">Just Something Fun</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/Blog/archives">
+              
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#CNN与GCN"><span class="nav-number">1.</span> <span class="nav-text">CNN与GCN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码解读"><span class="nav-number">2.</span> <span class="nav-text">代码解读</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#图卷积层-layer"><span class="nav-number">2.1.</span> <span class="nav-text">图卷积层 layer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#图卷积模型-model"><span class="nav-number">2.2.</span> <span class="nav-text">图卷积模型 model</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记"><span class="nav-number">3.</span> <span class="nav-text">后记</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基于注意力的图卷积模型"><span class="nav-number">3.1.</span> <span class="nav-text">基于注意力的图卷积模型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lavi</span>
+
+  
+</div>
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/Blog/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/Blog/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/Blog/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/Blog/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/Blog/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/Blog/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/Blog/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/Blog/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/Blog/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/Blog/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/Blog/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+<script src="/Blog/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/Blog/live2dw/assets/nipsilon.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"react":{"opacity":0.7}});</script></body>
+</html>

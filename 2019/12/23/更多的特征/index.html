@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/Blog/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/Blog/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/Blog/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/Blog/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/Blog/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/Blog/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/Blog/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言&amp;emsp;&amp;emsp;这一切的起因都需要从第一次参加Kaggle比赛说起，在接触泰塔尼克号的数据集之前，我以为全世界做机器学习或深度学习的数据集都会像Mnist一样标准整齐的，再者不济也会像做本科毕设时候那样的，随便掏出来就是几万条上下的水文数据。 &amp;emsp;&amp;emsp;真实世界中的数据往往与理想千差万别，数据缺项司空见惯，数据类型五花八门，如果拿着这种数据直接往模型里面怼，无论再怎么调参">
+<meta property="og:type" content="article">
+<meta property="og:title" content="更多的特征">
+<meta property="og:url" content="https:&#x2F;&#x2F;lav-i.github.io&#x2F;Blog&#x2F;2019&#x2F;12&#x2F;23&#x2F;%E6%9B%B4%E5%A4%9A%E7%9A%84%E7%89%B9%E5%BE%81&#x2F;index.html">
+<meta property="og:site_name" content="LLLLavi&#39;s Blog">
+<meta property="og:description" content="前言&amp;emsp;&amp;emsp;这一切的起因都需要从第一次参加Kaggle比赛说起，在接触泰塔尼克号的数据集之前，我以为全世界做机器学习或深度学习的数据集都会像Mnist一样标准整齐的，再者不济也会像做本科毕设时候那样的，随便掏出来就是几万条上下的水文数据。 &amp;emsp;&amp;emsp;真实世界中的数据往往与理想千差万别，数据缺项司空见惯，数据类型五花八门，如果拿着这种数据直接往模型里面怼，无论再怎么调参">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-11-15T15:15:20.660Z">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/Blog/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://lav-i.github.io/Blog/2019/12/23/更多的特征/"/>
+
+
+
+
+
+  <title>更多的特征 | LLLLavi's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/Blog/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LLLLavi's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/Blog/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/Blog/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://lav-i.github.io/Blog/Blog/2019/12/23/%E6%9B%B4%E5%A4%9A%E7%9A%84%E7%89%B9%E5%BE%81/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Lavi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/Blog/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LLLLavi's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">更多的特征</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-23T09:54:36+08:00">
+                2019-12-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>&emsp;&emsp;这一切的起因都需要从第一次参加Kaggle比赛说起，在接触泰塔尼克号的数据集之前，我以为全世界做机器学习或深度学习的数据集都会像Mnist一样标准整齐的，再者不济也会像做本科毕设时候那样的，随便掏出来就是几万条上下的水文数据。</p>
+<p>&emsp;&emsp;真实世界中的数据往往与理想千差万别，数据缺项司空见惯，数据类型五花八门，如果拿着这种数据直接往模型里面怼，无论再怎么调参那肯定都是 <em>“garbage in garbage out”</em> ，所以说当处理一个真实世界中的实际问题的时候，第一步工作一定是做数据分析/处理。</p>
+<h2 id="万能的Pandas"><a href="#万能的Pandas" class="headerlink" title="万能的Pandas"></a>万能的Pandas</h2><p>&emsp;&emsp;Pandas是python库中用于数据分析与处理非常好用的一个库，在接下来的工作中也会主要使用Pandas来作为处理数据的工具。针对不同的数据，处理方式也会不同，这次就简单记录一下我使用最频繁的三个函数。举个栗子</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>gender</th>
+<th>score</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>male</td>
+<td>60</td>
+</tr>
+<tr>
+<td>1</td>
+<td>female</td>
+<td>65</td>
+</tr>
+<tr>
+<td>2</td>
+<td>female</td>
+<td>75</td>
+</tr>
+<tr>
+<td>3</td>
+<td>male</td>
+<td>80</td>
+</tr>
+</tbody></table>
+<ol>
+<li><code>pd.factorize()</code> 用来处理离散的分类特征，可以把不同的类型映射成为int值，对例子中的gender列进行处理后的效果是</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>gender</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+</tr>
+<tr>
+<td>0</td>
+</tr>
+</tbody></table>
+<p>经过简单的处理后，这样的数据就可以送进模型中进行训练了，但是如果类型更多，映射后的int值就会逐渐递增，但不同的类型往往不具备线性特征，这样处理就会产生很多的限制。</p>
+<ol start="2">
+<li><code>pd.get_dummies()</code> 也就是将数据进行one-hot编码，对栗子中的gender列进行dummy()后的效果是</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>male</th>
+<th>female</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+</tr>
+</tbody></table>
+<p>经过这样处理后的数据列在送进模型后不具备连续关系，进行了完全拆散。</p>
+<ol start="3">
+<li><code>pd.qcut()</code> Binning化，用来将连续值进行分类，打个比喻就是把成绩划分为低中高，对例子中的score列进行处理后的效果是</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>score</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>60-70</td>
+</tr>
+<tr>
+<td>60-70</td>
+</tr>
+<tr>
+<td>70-80</td>
+</tr>
+<tr>
+<td>70-80</td>
+</tr>
+</tbody></table>
+<h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>&emsp;&emsp;现在实验室中负责研究的项目我们调侃为5914，意思是数据集的大小为59行14列，真真正正的小数据集，为了能让它在模型中产生更好的效果，在Kaggle的泰坦尼克号数据集上用过的特征挖掘方法疯狂往5914上套用，分分钟变成5934，感觉这个项目分分钟就要成功了。</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>&emsp;&emsp;实际上根本没有用，甚至效果还倒退了不少，尽管尝试了相关性分析然后筛选掉了不重要的特征列，但是数据的维度还是太大了，大量的滥用<code>get_dummies()</code>使得特征矩阵变得稀疏，原本有一些线性关系的数据列也被完全打散。</p>
+<p>&emsp;&emsp;不过总的来说，特征挖掘这项技术还是非常有用的，尤其是面对真实复杂的数据集时。那么接下来还是需要研究更多的方法，或许试试不同的数据降维方法？（笑</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/Blog/2019/11/28/Emoji-Maker/" rel="next" title="Emoji Maker">
+                <i class="fa fa-chevron-left"></i> Emoji Maker
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/Blog/2020/01/09/Siamese-networks-and-Triplet-Loss/" rel="prev" title="Siamese networks and Triplet Loss">
+                Siamese networks and Triplet Loss <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/Blog/uploads/avatar.jpg"
+                alt="Lavi" />
+            
+              <p class="site-author-name" itemprop="name">Lavi</p>
+              <p class="site-description motion-element" itemprop="description">Just Something Fun</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/Blog/archives">
+              
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#万能的Pandas"><span class="nav-number">2.</span> <span class="nav-text">万能的Pandas</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用"><span class="nav-number">3.</span> <span class="nav-text">应用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记"><span class="nav-number">4.</span> <span class="nav-text">后记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lavi</span>
+
+  
+</div>
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/Blog/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/Blog/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/Blog/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/Blog/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/Blog/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/Blog/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/Blog/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/Blog/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/Blog/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/Blog/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/Blog/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+<script src="/Blog/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/Blog/live2dw/assets/nipsilon.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"react":{"opacity":0.7}});</script></body>
+</html>
