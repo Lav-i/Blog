@@ -146,3 +146,8 @@ root@e8bb7249b843:/#
 ## 后记
 
 &emsp;&emsp;我在没有安装nodejs的情况下发布了这篇文章，好耶！（失败力，如果想要用到hexo的自动部署功能，还需要安装git、openssh，最重要的是还需要id_rsa，这可太难搞了）
+
+补充：删除无用镜像
+```sh
+docker rmi $(docker images -f "dangling=true" -q)
+```
